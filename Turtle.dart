@@ -69,7 +69,7 @@ class Turtle implements Touchable {
       roundRect(ctx, -0.2, -0.5, 0.4, 1, 0.2);
       ctx.fillStyle = color;
       ctx.fill();
-      ctx.strokeStyle = "white";
+      ctx.strokeStyle = "rgba(255, 255, 255, 0.5)";
       ctx.lineWidth = 0.05;
       ctx.stroke();
       ctx.restore();
