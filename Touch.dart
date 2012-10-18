@@ -129,41 +129,41 @@ class TouchManager {
    }
    
    
-   void touchDown(TouchEvent evt) {
-      for (var t in evt.changedTouches) {
+   void touchDown(var tframe) {
+      for (var t in tframe.changedTouches) {
          if (t.down) {
             var target = findTouchTarget(t);
             if (target != null) {
-               touch_bindings[evt.id] = target;
-               target.touchDown(evt);
+               touch_bindings[t.id] = target;
+               target.touchDown(t);
             }
          }
       }
    }
    
    
-   void touchUp(TouchEvent evt) {
-      for (var t in evt.changedTouches) {
+   void touchUp(var tframe) {
+      for (var t in tframe.changedTouches) {
          if (t.up) {
             var target = touch_bindings[t.id];
             if (target != null) {
-               target.touchUp(evt);
+               target.touchUp(t);
                touch_bindings[t.id] = null;
             }
          }
       }
-      if (evt.touches.length == 0) {
+      if (tframe.touches.length == 0) {
          touch_bindings = [];
       }
    }
    
    
-   void touchDrag(TouchEvent evt) {
-      for (var t in evt.changedTouches) {
+   void touchDrag(var tframe) {
+      for (var t in tframe.changedTouches) {
          if (t.drag) {
             var target = touch_bindings[t.id];
             if (target != null) {
-               target.touchDrag(evt);
+               target.touchDrag(t);
             }
          }
       }
@@ -174,7 +174,7 @@ class TouchManager {
  * Process JSON touch events from microsoft surface
  */
    void processTouches(data) {
-      var frame = new JsonObject.fromJsonString( data );
+      var frame = new JsonObject.fromJsonString(data);
       
       var changed = [];
       bool down = false;
@@ -215,10 +215,7 @@ interface Touchable {
    void touchUp(TouchEvent event);
    
    void touchDrag(TouchEvent event);
-   
-   num screenToObjectX(num sx, num sy);
-   
-   num screenToObjectY(num sx, num sy);
+
 }
 
 
@@ -241,9 +238,9 @@ class TouchEvent {
    }
    
    TouchEvent.fromJSON(var json) {
-      id = int.parse(json.identifier);
-      touchX = double.parse(json.pageX);
-      touchY = double.parse(json.pageY);
+      id = json.identifier;
+      touchX = json.pageX;
+      touchY = json.pageY;
       up = json.up;
       down = json.down;
       drag = json.drag;
