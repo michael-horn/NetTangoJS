@@ -27,7 +27,7 @@ class JsonObject extends Object implements Map {
   ///or [JsonObject.fromMap()].
   ///The default constructor [JsonObject()], however will set this value to
   ///true, otherwise you can't actually add any new properties.
-  bool isExtendable;
+  bool isExtendable = true;
 
   //default constructor.
   //creates a new empty map.
@@ -46,7 +46,7 @@ class JsonObject extends Object implements Map {
     t._jsonString = _jsonString;
     t._objectData = JSON.parse(t._jsonString);
     t._extractElements(t._objectData);
-    t.isExtendable = false;
+    t.isExtendable = true;
     return t;
 
   }
