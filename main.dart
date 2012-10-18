@@ -40,17 +40,23 @@ class NetTango extends TouchManager {
 
    
    NetTango() {
+      width = window.innerWidth;
+      height = window.innerHeight;
+  
       CanvasElement canvas = document.query("#layer1");
+      canvas.width = width;
+      canvas.height = height;
       background = canvas.getContext("2d");
       
       canvas = document.query("#layer2");
+      canvas.width = width;
+      canvas.height = height;
       foreground = canvas.getContext("2d");
       registerEvents(canvas);
       
-      width = canvas.width;
-      height = canvas.height;
       
       model = new Model(this);
+      model.resizeToFitScreen(width, height);
       drawBackground();
       play(1);
    }
