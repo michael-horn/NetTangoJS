@@ -67,7 +67,7 @@ class Tween {
       num t = getTime();
       num len = segments.length;
       if (len == 0) return 0;
-      if (len == 1) return start;
+      if (len == 1) segments[0];
       var prev = segments[0];
       var next = segments[len-1];
       
