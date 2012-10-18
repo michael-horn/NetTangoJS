@@ -4,9 +4,14 @@ class Model {
    var turtles;
    bool loaded = false;
    var name = "";
-   num w = 700;
-   num h = 700;
+
    NetTango ntango;
+   
+   int patchSize = 50;
+   int maxPatchX = 12;
+   int minPatchX = -12;
+   int maxPatchY = 12;
+   int minPatchY = -12;
    
    
    Model(this.ntango) {
@@ -18,6 +23,17 @@ class Model {
       }
    }
    
+   
+   void resizeToFitScreen(int screenW, int screenH) {
+      int hpatches = screenW ~/ patchSize;
+      int vpatches = screenH ~/ patchSize;
+      maxPatchX = hpatches ~/ 2;
+      maxPatchY = vpatches ~/ 2;
+      minPatchX = maxPatchX - hpatches + 1;
+      minPatchY = maxPatchY - vpatches + 1;
+   }
+   
+   
    void restart() { }
    
    void tick(int count) {
@@ -28,10 +44,11 @@ class Model {
  
    
    void draw(var ctx) {
-      num psize = w / worldWidth;
+      num cx = (0.5 - minPatchX) * patchSize;
+      num cy = (0.5 - minPatchY) * patchSize;
       ctx.save();
-      ctx.translate(w/2, h/2);
-      ctx.scale(psize, -psize);
+      ctx.translate(cx, cy);
+      ctx.scale(patchSize, -patchSize);
       
       for (var turtle in turtles) {
          turtle.draw(ctx);
@@ -41,18 +58,16 @@ class Model {
    
    
    num screenToWorldX(num sx, num sy) {
-      return (sx - w/2) * (worldWidth / w);
+      num cx = (0.5 - minPatchX) * patchSize;
+      return (sx - cx) / patchSize;
    }
    
    num screenToWorldY(num sx, num sy) {
-      return (h/2 - sy) * (worldHeight / h);      
+      num cy = (0.5 - minPatchY) * patchSize;
+      return (cy - sy) / patchSize;      
    }
    
    
-   int get maxPatchX => 12;
-   int get maxPatchY => 12;
-   int get minPatchX => -12;
-   int get minPatchY => -12;
    num get minWorldY => minPatchY - 0.5;
    num get minWorldX => minPatchX - 0.5;
    num get maxWorldY => maxPatchY + 0.5;
