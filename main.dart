@@ -4,8 +4,10 @@
 #import('dart:math');
 #import('dart:json');
 
+#source('Color.dart');
 #source('Touch.dart');
 #source('Turtle.dart');
+#source('Patch.dart');
 #source('Tween.dart');
 #source('Model.dart');
 #source('JsonObject.dart');
@@ -18,8 +20,8 @@ void main() {
 
 class NetTango extends TouchManager {
    
-   CanvasRenderingContext2D background;
-   CanvasRenderingContext2D foreground;
+   CanvasRenderingContext2D pctx;
+   CanvasRenderingContext2D tctx;
    
    Model model;
 
@@ -43,21 +45,22 @@ class NetTango extends TouchManager {
       width = window.innerWidth;
       height = window.innerHeight;
   
-      CanvasElement canvas = document.query("#layer1");
+      // Canvas for drawing patches
+      CanvasElement canvas = document.query("#patches");
       canvas.width = width;
       canvas.height = height;
-      background = canvas.getContext("2d");
+      pctx = canvas.getContext("2d");
       
-      canvas = document.query("#layer2");
+      // Canvas for drawing turtles
+      canvas = document.query("#turtles");
       canvas.width = width;
       canvas.height = height;
-      foreground = canvas.getContext("2d");
+      tctx = canvas.getContext("2d");
       registerEvents(canvas);
       
-      
+      // Create and resize the model
       model = new Model(this);
       model.resizeToFitScreen(width, height);
-      drawBackground();
       play(1);
    }
  
@@ -67,7 +70,6 @@ class NetTango extends TouchManager {
  */
    void restart() {
       model.restart();
-      drawBackground();
    }
 
    
@@ -107,14 +109,10 @@ class NetTango extends TouchManager {
 
 
    void draw() {
-      var ctx = foreground;
-      ctx.clearRect(0, 0, width, height);
-      model.draw(ctx);
-   }
+      model.drawPatches(pctx);
 
-   
-   void drawBackground() {
-      var ctx = background;
-      ctx.clearRect(0, 0, width, height);
+      tctx.clearRect(0, 0, width, height);
+      model.drawTurtles(tctx);
+      
    }
 }
