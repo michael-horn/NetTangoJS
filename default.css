@@ -3,6 +3,7 @@
 * { -webkit-user-select: none; }
 
 body {
+   background-image: url('images/texture2.png');
    margin: 0;
    padding: 0;
    color: #ccc;
@@ -14,13 +15,14 @@ body {
 }
 
 #patches {
-   background-image: url('images/texture2.png');
+   position: absolute;
    z-index: 0;
    left: 0px;
    top: 0px;
 }
 
 #turtles {
+   position; absolute;
    z-index: 1;
    left: 0px;
    top: 0px;
