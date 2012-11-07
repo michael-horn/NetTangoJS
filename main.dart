@@ -25,17 +25,10 @@ class NetTango extends TouchManager {
    
    CanvasRenderingContext2D pctx;
    CanvasRenderingContext2D tctx;
-   CanvasRenderingContext2D gctx; // for plot
    
    Model model;
-   
    Toolbar toolbar;
    
-
-   // Plot (this will need to be replaced with something more generic!)
-   StackGraph plot;
-
-
    int width = 1000;
    int height = 700;
    
@@ -68,21 +61,26 @@ class NetTango extends TouchManager {
       // Canvas for drawing turtles
       canvas = document.query("#turtles");
       tctx = canvas.getContext("2d");
-      registerEvents(canvas);
       canvas.width = width;
       canvas.height = height;
+
       
-      // Canvas for plot
-      canvas = document.query("#plot");
-      gctx = canvas.getContext("2d");
-      plot = new StackGraph(canvas.width, canvas.height);
+      // Create toolbar
+      toolbar = new Toolbar(this);
+      
       
       // Create and resize the model
       model = new Model(this);
       model.resizeToFitScreen(width, height);
-      play(1);
+
       
-      toolbar = new Toolbar(model);
+      // Event capture layer
+      canvas = document.query("#events");
+      canvas.width = width;
+      canvas.height = height;
+      registerEvents(canvas);
+      
+      restart();
    }
  
  
@@ -90,8 +88,10 @@ class NetTango extends TouchManager {
  * Restart the simulation
  */
    void restart() {
+      pause();
       ticks = 0;
-      model.restart();
+      model.setup();
+      draw();
    }
 
    
@@ -100,8 +100,10 @@ class NetTango extends TouchManager {
  */
    void tick() {
       if (play_state != 0) {
-         ticks++;
-         animate();
+         for (int i=0; i<play_state; i++) {
+            ticks++;
+            animate();
+         }
          draw();
          window.setTimeout(tick, 20);
       }
@@ -113,7 +115,6 @@ class NetTango extends TouchManager {
  */
    void play(num speedup) {
       play_state = speedup;
-      print("play");
       tick();
    }
    
@@ -126,19 +127,40 @@ class NetTango extends TouchManager {
    }
    
    
+/*
+ * Speed up the simulation
+ */
+   void fastForward() {
+      if (play_state < 8 && play_state > 0) {
+         play_state *= 2;
+      } else if (play_state == 0) {
+         play(1);
+      } else {
+         play_state = 1;
+      }
+   }
+   
+   
+/*
+ * Step forward 1 tick 
+ */
+   void stepForward() {
+      pause();
+      ticks++;
+      animate();
+      draw();
+   }
+   
+   
    void animate() {
       model.tick(play_state);
-      if (ticks % 10 == 0) {
-         plot.addDataPoint(ticks, model.turtles.length);
-      }
    }
 
 
    void draw() {
       model.drawPatches(pctx);
-
       tctx.clearRect(0, 0, width, height);
       model.drawTurtles(tctx);
-      plot.draw(gctx);
+      toolbar.draw();
    }
 }
