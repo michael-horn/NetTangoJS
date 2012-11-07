@@ -11,32 +11,40 @@
  * material are those of the author(s) and do not necessarily reflect the views
  * of the National Science Foundation (NSF).
  */
-class Toolbar {
+class Toolbar implements Touchable {
 
-   var buttons;
-   var ctx;  // drawing context
+   // list of buttons contained in the toolbar
+   List<Button> buttons;
+   
+   // drawing context 
+   var ctx;
+   
+   // for dispatching touch events
    Button target = null;
-   Model model;
-   int pstate = 0;
-   int width = 440;
-   int height = 70;
-   int x, y;
+   
+   // used to control the model
+   NetTango app;
+   
+   // toolbar dimensions
+   int x, y, width, height;
    
    Button playButton;
    Button pauseButton;
    //Button scrubButton;
-   //Button fullButton;
-   //Button partButton;
+   Button fullButton;
+   Button partButton;
    //protected int scrubMax;
    //protected boolean fullscreen = false;
 
    
-   Toolbar(this.model) {
+   Toolbar(this.app) {
       
       CanvasElement canvas = document.query("#toolbar");
       ctx = canvas.getContext("2d");
       width = canvas.width;
       height = canvas.height;
+      x = canvas.offsetLeft;
+      y = canvas.offsetTop;
 
       buttons = new List<Button>();
       //this.scrubMax = model.getStream().getCapacity();
@@ -52,108 +60,126 @@ class Toolbar {
 
       button = new Button(w~/2 - bw~/2 + 3, by, bw, bh, "play");
       button.setImage("images/play.png");
-      TouchManager.addTouchable(button);
       buttons.add(button);
-      button.onClick = action;
-      button.onDown = action;
-      button.enabled = (pstate == 0);
-      button.visible = (pstate == 0);
+      button.onClick = doPlay;
+      button.onDown = repaint;
+      button.enabled = true;
+      button.visible = true;
       playButton = button;
       
       button = new Button(w~/2 - bw~/2 + 3, by, bw, bh, "pause");
       button.setImage("images/pause.png");
-      button.onClick = action;
-      button.onDown = action;
-      TouchManager.addTouchable(button);
-      button.visible = (pstate != 0);
-      button.enabled = (pstate != 0);
+      button.onClick = doPause;
+      button.onDown = repaint;
+      button.visible = false;
+      button.enabled = false;
       buttons.add(button);
       pauseButton = button;
       bx += bw;
 
       button = new Button(w~/2 + bx - bw~/2, by, bw, bh, "fastforward");
       button.setImage("images/fastforward.png");
-      button.onClick = action;
-      button.onDown = action;
-      TouchManager.addTouchable(button);
+      button.onDown = repaint;
+      button.onClick = doFastForward;
       buttons.add(button);
       
       button = new Button(w~/2 - bw~/2 - bx, by, bw, bh, "rewind");
       button.setImage("images/rewind.png");
-      button.onClick = action;
-      button.onDown = action;
-      TouchManager.addTouchable(button);
+      button.onDown = repaint;
       buttons.add(button);
       bx += bw;
 
       button = new Button(w~/2 + bx - bw~/2, by, bw, bh, "stepforward");
       button.setImage("images/stepforward.png");
-      button.onClick = action;
-      button.onDown = action;
-      TouchManager.addTouchable(button);
+      button.onDown = repaint;
       buttons.add(button);
       
       button = new Button(w~/2 - bx - bw~/2, by, bw, bh, "stepback");
       button.setImage("images/stepback.png");
-      button.onClick = action;
-      button.onDown = action;
-      TouchManager.addTouchable(button);
+      button.onDown = repaint;
       buttons.add(button);
 
-      bx = 10;
+      bx = 12;
       button = new Button(bx, by, bw, bh, "restart");
       button.setImage("images/restart.png");
-      button.onClick = action;
-      button.onDown = action;
-      TouchManager.addTouchable(button);
+      button.onDown = repaint;
+      button.onClick = doRestart;
       buttons.add(button);
       
-/*      
-      bx = w - 10 - bw;
+      bx = w - 8 - bw;
       button = new Button(bx, by, bw, bh, "fullscreen");
-      button.setImage("/images/fullscreen.png");
+      button.setImage("images/fullscreen.png");
       buttons.add(button);
+      button.onDown = repaint;
       fullButton = button;
       
       button = new Button(bx, by, bw, bh, "partscreen");
-      button.setImage("/images/partscreen.png");
+      button.setImage("images/partscreen.png");
       buttons.add(button);
-      button.setVisible(false);
-      button.setEnabled(false);
+      button.visible = false;
+      button.enabled = false;
       partButton = button;
 
       bw = 250;
       bh = 10;
-      bx = w/2 - bw/2;
-      by = h - bh/2 - 10;
-
+      bx = w~/2 - bw~/2;
+      by = h - bh~/2 - 10;
+/*
       button = new Button(bx - 10, by - 10, 20, 20, "ball");
       button.setImage("/images/ball.png");
       buttons.add(button);
       scrubButton = button;
 */
       window.setTimeout(draw, 200);
+      
+      TouchManager.addTouchable(this);
    }
    
-   void action(var act) {
+   
+   void repaint(var act) {
       draw();
    }
    
    
-   bool isPlaying() {
-      return pstate > 0;
+   void doPlay(var a) {
+      playButton.enabled = false;
+      playButton.visible = false;
+      pauseButton.enabled = true;
+      pauseButton.visible = true;
+      app.play(1);
+      draw();
    }
    
    
-   bool isPaused() {
-      return pstate == 0;
+   void doPause(var a) {
+     playButton.enabled = true;
+     playButton.visible = true;
+     pauseButton.enabled = false;
+     pauseButton.visible = false;
+     app.pause();
+     draw();     
    }
    
-/*   
-   bool isFullscreen() {
-      return fullscreen;
+   
+   void doRestart(var a) {
+     playButton.enabled = true;
+     playButton.visible = true;
+     pauseButton.enabled = false;
+     pauseButton.visible = false;
+     app.restart();
+     draw();      
    }
-*/ 
+   
+   
+   void doFastForward(var a) {
+     playButton.enabled = false;
+     playButton.visible = false;
+     pauseButton.enabled = true;
+     pauseButton.visible = true;
+     app.fastForward();
+     draw();      
+   }
+   
 
    void draw() {
       
@@ -315,4 +341,46 @@ class Toolbar {
    }
    */
 
+   
+   bool containsTouch(TouchEvent event) {
+      num tx = event.touchX;
+      num ty = event.touchY;
+      return (tx >= x && ty >= y && tx <= x + width && ty <= y + height);
+   }
+   
+
+   bool touchDown(TouchEvent event) {
+      event.touchX -= x;
+      event.touchY -= y;
+      for (var b in buttons) {
+         if (b.containsTouch(event) && b.enabled && b.visible) {
+            target = b;
+            target.touchDown(event);
+            return true;
+         }
+      }
+      return false;
+   }
+   
+   
+   void touchUp(TouchEvent event) {
+      event.touchX -= x;
+      event.touchY -= y;
+      if (target != null) {
+         target.touchUp(event);
+         target = null;
+      }
+   }
+   
+
+   void touchDrag(TouchEvent event) {
+      event.touchX -= x;
+      event.touchY -= y;
+      if (target != null) {
+         target.touchDrag(event);
+      }
+   }
+   
+
+   void touchSlide(TouchEvent event) { }
 }
