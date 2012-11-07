@@ -25,7 +25,7 @@
    // only draw a patch if it needs updating
    bool dirty = true;
    
-   int energy = 100;
+   num energy = 1;
 
    
    Patch(this.model, this.x, this.y) {
@@ -34,8 +34,8 @@
    
    
    void animate() {
-      if (energy < 100) {
-         energy += 1;
+      if (energy < 1) {
+         energy += 0.01;
          dirty = true;
       }
    }
@@ -44,7 +44,7 @@
    void draw(var ctx) {
       if (dirty) {
          ctx.clearRect(x - 0.5, y - 0.5, 1, 1);
-         color.alpha = 255 - ((energy / 100) * 255).toInt();
+         color.alpha = (155 * (1 - energy)).toInt();
          ctx.fillStyle = color.toString();
          ctx.fillRect(x - 0.5, y - 0.5, 1, 1);
          dirty = false;
@@ -69,7 +69,7 @@
    
    
    void touchSlide(TouchEvent event) {
-     energy -= 150;
+     energy -= 0.5;
      if (energy < 0) energy = 0;
      dirty = true;
    }
