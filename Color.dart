@@ -16,6 +16,18 @@ class Color {
    
    Color(this.r, this.g, this.b, this.a);
    
+   Color clone() {
+      return new Color(r, g, b, a);
+   }
+   
+   
+   void setColor(int r, int g, int b, int a) {
+      this.r = r;
+      this.g = g;
+      this.b = b;
+      this.a = a;
+   }
+   
    int get red => r;
        set red(int r) { if (r >= 0) { this.r = r < 256? r : 255; }}
    int get green => g;

@@ -14,10 +14,10 @@
 class TouchManager {
 
    // A list of touchable objects on the screen
-   var touchables;
+   static var touchables;
    
    // Bindings from event IDs to touchable objects
-   var touch_bindings;
+   static var touch_bindings;
    
    // Touch event frame from microsoft surface
    var pframe = null;
@@ -57,7 +57,7 @@ class TouchManager {
 /*
  * Add a touchable object to the list
  */
-   void addTouchable(Touchable t) {
+   static void addTouchable(Touchable t) {
       touchables.add(t);
    }
    
@@ -65,7 +65,7 @@ class TouchManager {
 /*
  * Remove a touchable object from the master list
  */
-   void removeTouchable(Touchable t) {
+   static void removeTouchable(Touchable t) {
       for (int i=0; i<touchables.length; i++) {
          if (t == touchables[i]) {
             touchables.removeRange(i, 1);
@@ -81,7 +81,6 @@ class TouchManager {
    Touchable findTouchTarget(TouchEvent tp) {
       for (var t in touchables) {
          if (t.containsTouch(tp)) {
-            print("found one");
             return t;
          }
       }
@@ -109,8 +108,9 @@ class TouchManager {
       TouchEvent t = new TouchEvent.fromMouse(evt);
       var target = findTouchTarget(t);
       if (target != null) {
-         touch_bindings[-1] = target;
-         target.touchDown(t);
+         if (target.touchDown(t)) {
+            touch_bindings[-1] = target;
+         }
       }
       mdown = true;
    }
@@ -121,9 +121,15 @@ class TouchManager {
  */
    void mouseMove(MouseEvent evt) {
       if (mdown) {
+         TouchEvent t = new TouchEvent.fromMouse(evt);
          var target = touch_bindings[-1];
          if (target != null) {
-            target.touchDrag(new TouchEvent.fromMouse(evt));
+            target.touchDrag(t);
+         } else {
+            target = findTouchTarget(t);
+            if (target != null) {
+               target.touchSlide(t);
+            }
          }
       }
    }
@@ -134,8 +140,9 @@ class TouchManager {
          if (t.down) {
             var target = findTouchTarget(t);
             if (target != null) {
-               touch_bindings[t.id] = target;
-               target.touchDown(t);
+               if (target.touchDown(t)) {
+                  touch_bindings[t.id] = target;
+               }
             }
          }
       }
@@ -164,6 +171,11 @@ class TouchManager {
             var target = touch_bindings[t.id];
             if (target != null) {
                target.touchDrag(t);
+            } else {
+               target = findTouchTarget(t);
+               if (target != null) {
+                 target.touchSlide(t);
+               }
             }
          }
       }
@@ -206,43 +218,57 @@ class TouchManager {
 }
 
 
+/*
+ * Objects on the screen must implement this interface to receive touch events
+ */
 interface Touchable {
    
    bool containsTouch(TouchEvent event);
    
-   void touchDown(TouchEvent event);
+   // This gets fired if a touch down lands on the touchable object. 
+   // Return true to 'own' the touch event for the duration 
+   // Return false to ignore the event (e.g. if disabled or if you want slide events)
+   bool touchDown(TouchEvent event);
    
    void touchUp(TouchEvent event);
    
+   // This gets fired only after a touchDown lands on the touchable object
    void touchDrag(TouchEvent event);
+   
+   // This gets fired when an unbound touch events slides over an object
+   void touchSlide(TouchEvent event);
 
 }
 
 
 class TouchEvent {
-   int id;
-   num touchX = 0;
-   num touchY = 0;
-   bool up = false;
-   bool down = false;
-   bool drag = false;
-   bool finger = false;
-   
-   TouchEvent(this.id);
-   
-   TouchEvent.fromMouse(MouseEvent mouse) {
-      id = -1;
-      touchX = mouse.clientX;
-      touchY = mouse.clientY;
-      finger = true;
-   }
-   
-   TouchEvent.fromJSON(var json) {
-      id = json.identifier;
-      touchX = json.pageX;
-      touchY = json.pageY;
-      up = json.up;
-      down = json.down;
-      drag = json.drag;
-   }
+  int id;
+  int tagId = -1;
+  num touchX = 0;
+  num touchY = 0;
+  bool tag = false;
+  bool up = false;
+  bool down = false;
+  bool drag = false;
+  bool finger = false;
+  
+  TouchEvent(this.id);
+  
+  TouchEvent.fromMouse(MouseEvent mouse) {
+    id = -1;
+    touchX = mouse.clientX;
+    touchY = mouse.clientY;
+    finger = true;
+  }
+  
+  TouchEvent.fromJSON(var json) {
+    id = json.identifier;
+    touchX = json.pageX;
+    touchY = json.pageY;
+    up = json.up;
+    down = json.down;
+    drag = json.drag;
+    tag = json.tag;
+    tagId = json.tagId;
+  }
 }

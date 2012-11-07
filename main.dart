@@ -10,6 +10,9 @@
 #source('Patch.dart');
 #source('Tween.dart');
 #source('Model.dart');
+#source('Toolbar.dart');
+#source('Button.dart');
+#source('StackGraph.dart');
 #source('JsonObject.dart');
 
 
@@ -22,11 +25,22 @@ class NetTango extends TouchManager {
    
    CanvasRenderingContext2D pctx;
    CanvasRenderingContext2D tctx;
+   CanvasRenderingContext2D gctx; // for plot
    
    Model model;
+   
+   Toolbar toolbar;
+   
+
+   // Plot (this will need to be replaced with something more generic!)
+   StackGraph plot;
+
 
    int width = 1000;
    int height = 700;
+   
+   // current tick count
+   int ticks = 0;
    
    
    //-------------------------------------------
@@ -44,24 +58,31 @@ class NetTango extends TouchManager {
    NetTango() {
       width = window.innerWidth;
       height = window.innerHeight;
-  
+     
       // Canvas for drawing patches
       CanvasElement canvas = document.query("#patches");
+      pctx = canvas.getContext("2d");
       canvas.width = width;
       canvas.height = height;
-      pctx = canvas.getContext("2d");
       
       // Canvas for drawing turtles
       canvas = document.query("#turtles");
-      canvas.width = width;
-      canvas.height = height;
       tctx = canvas.getContext("2d");
       registerEvents(canvas);
+      canvas.width = width;
+      canvas.height = height;
+      
+      // Canvas for plot
+      canvas = document.query("#plot");
+      gctx = canvas.getContext("2d");
+      plot = new StackGraph(canvas.width, canvas.height);
       
       // Create and resize the model
       model = new Model(this);
       model.resizeToFitScreen(width, height);
       play(1);
+      
+      toolbar = new Toolbar(model);
    }
  
  
@@ -69,6 +90,7 @@ class NetTango extends TouchManager {
  * Restart the simulation
  */
    void restart() {
+      ticks = 0;
       model.restart();
    }
 
@@ -78,6 +100,7 @@ class NetTango extends TouchManager {
  */
    void tick() {
       if (play_state != 0) {
+         ticks++;
          animate();
          draw();
          window.setTimeout(tick, 20);
@@ -105,6 +128,9 @@ class NetTango extends TouchManager {
    
    void animate() {
       model.tick(play_state);
+      if (ticks % 10 == 0) {
+         plot.addDataPoint(ticks, model.turtles.length);
+      }
    }
 
 
@@ -113,6 +139,6 @@ class NetTango extends TouchManager {
 
       tctx.clearRect(0, 0, width, height);
       model.drawTurtles(tctx);
-      
+      plot.draw(gctx);
    }
 }

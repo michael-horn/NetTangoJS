@@ -11,7 +11,7 @@
  * material are those of the author(s) and do not necessarily reflect the views
  * of the National Science Foundation (NSF).
  */
- class Patch {
+ class Patch implements Touchable {
    
    // patch coordinates
    int x, y;
@@ -19,20 +19,23 @@
    // patch color
    Color color;
    
+   // reference to model
+   Model model;
+   
    // only draw a patch if it needs updating
    bool dirty = true;
    
-   int energy = 0;
+   int energy = 100;
 
    
-   Patch(this.x, this.y) {
-      color = new Color(255, 255, 0, 255);
+   Patch(this.model, this.x, this.y) {
+      color = new Color(0, 0, 0, 0);
    }
    
    
    void animate() {
-      if (color.alpha > 0) {
-         color.alpha = color.alpha - 1;
+      if (energy < 100) {
+         energy += 1;
          dirty = true;
       }
    }
@@ -41,12 +44,37 @@
    void draw(var ctx) {
       if (dirty) {
          ctx.clearRect(x - 0.5, y - 0.5, 1, 1);
+         color.alpha = 255 - ((energy / 100) * 255).toInt();
          ctx.fillStyle = color.toString();
          ctx.fillRect(x - 0.5, y - 0.5, 1, 1);
-         ctx.strokeStyle = "rgba(255, 255, 255, 0.5)";
-         ctx.lineWidth = 0.03;
-         ctx.strokeRect(x - 0.5, y - 0.5, 1, 1);
          dirty = false;
       }
+   }
+   
+   
+   bool containsTouch(TouchEvent event) {
+     double tx = model.screenToWorldX(event.touchX, event.touchY);
+     double ty = model.screenToWorldY(event.touchX, event.touchY);
+     return (tx >= x-0.5 && tx <= x+0.5 && ty >= y-0.5 && ty <= y+0.5);
+   }
+
+
+   bool touchDown(TouchEvent event) {
+      return false;
+   }
+
+
+   void touchUp(TouchEvent event) {
+   }
+   
+   
+   void touchSlide(TouchEvent event) {
+     energy -= 150;
+     if (energy < 0) energy = 0;
+     dirty = true;
+   }
+
+   
+   void touchDrag(TouchEvent event) {
    }
 }
