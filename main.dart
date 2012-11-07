@@ -54,15 +54,16 @@ class NetTango extends TouchManager {
      
       // Canvas for drawing patches
       CanvasElement canvas = document.query("#patches");
-      pctx = canvas.getContext("2d");
       canvas.width = width;
       canvas.height = height;
+      pctx = canvas.getContext("2d");
+
       
       // Canvas for drawing turtles
       canvas = document.query("#turtles");
-      tctx = canvas.getContext("2d");
       canvas.width = width;
       canvas.height = height;
+      tctx = canvas.getContext("2d");
 
       
       // Create toolbar
