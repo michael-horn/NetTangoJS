@@ -92,6 +92,7 @@ class Toolbar implements Touchable {
       button = new Button(w~/2 + bx - bw~/2, by, bw, bh, "stepforward");
       button.setImage("images/stepforward.png");
       button.onDown = repaint;
+      button.onClick = doStepForward;
       buttons.add(button);
       
       button = new Button(w~/2 - bx - bw~/2, by, bw, bh, "stepback");
@@ -109,6 +110,8 @@ class Toolbar implements Touchable {
       bx = w - 8 - bw;
       button = new Button(bx, by, bw, bh, "fullscreen");
       button.setImage("images/fullscreen.png");
+      button.visible = false;
+      button.enabled = false;
       buttons.add(button);
       button.onDown = repaint;
       fullButton = button;
@@ -116,8 +119,6 @@ class Toolbar implements Touchable {
       button = new Button(bx, by, bw, bh, "partscreen");
       button.setImage("images/partscreen.png");
       buttons.add(button);
-      button.visible = false;
-      button.enabled = false;
       partButton = button;
 
       bw = 250;
@@ -180,6 +181,16 @@ class Toolbar implements Touchable {
      draw();      
    }
    
+   
+   void doStepForward(var a) {
+      playButton.enabled = true;
+      playButton.visible = true;
+      pauseButton.enabled = false;
+      pauseButton.visible = false;
+      app.stepForward();
+      draw();      
+   }
+   
 
    void draw() {
       
@@ -194,37 +205,35 @@ class Toolbar implements Touchable {
       //---------------------------------------------
       // Draw speedup
       //---------------------------------------------
-      /*
-      g.setFont(Palette.FONT_H1);
+      ctx.font = "24px sans-serif";
+      ctx.fillStyle = "white";
+      ctx.textBaseline = "bottom";
+      ctx.textAlign = "left";
+      int pstate = app.play_state.abs();
       if (pstate > 1) {
-         g.drawString("x" + pstate, w/2 - 160, h - 10);
-      }
-      else if (pstate < -1) {
-         g.drawString("x" + (pstate * -1), w/2 - 160, h - 10);
-      }
-      */
+         ctx.fillText("x$pstate", w~/2 - 160, h - 10);
+      } 
       
       //---------------------------------------------
       // Draw tick counter
       //---------------------------------------------
-      /*
-      g.setFont(Palette.FONT_BODY);
-      String s = "tick: " + model.getPlayHead();
-      int fw = g.getFontMetrics().stringWidth(s);
-      g.drawString(s, w - fw - 10, h - 15);
-      */
+      int ticks = app.ticks;
+      ctx.font = "12px sans-serif";
+      ctx.fillStyle = "white";
+      ctx.textAlign = "right";
+      ctx.fillText("tick: $ticks", w - 15, h - 12);
       
       //---------------------------------------------
       // Draw the scrub bar
       //---------------------------------------------
-      /*
       int bw = 250;
       int bh = 10;
-      int bx = w/2 - bw/2;
+      int bx = w~/2 - bw~/2;
       int by = h - bh - 10;
-      g.setColor(Color.DARK_GRAY);
-      g.fillRect(bx, by, bw, bh);
+      ctx.fillStyle = "rgba(0, 0, 0, 0.4)";
+      ctx.fillRect(bx, by, bw, bh);
 
+      /*
       SimStream stream = model.getStream();
       float scale = (float)bw / scrubMax;
       int min = (int)(stream.getMinIndex() * scale);
@@ -345,6 +354,7 @@ class Toolbar implements Touchable {
    bool containsTouch(TouchEvent event) {
       num tx = event.touchX;
       num ty = event.touchY;
+      print("testing");
       return (tx >= x && ty >= y && tx <= x + width && ty <= y + height);
    }
    
