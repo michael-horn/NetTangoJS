@@ -42,7 +42,19 @@ class Model {
    
    
    void setup() {
-      turtles = new List<Turtle>();
+      
+      clearTurtles();
+      clearPatches();
+      
+      patches = new List(worldWidth);
+      for (int i=0; i < patches.length; i++) {
+         patches[i] = new List<Patch>(worldHeight);
+         for (int j=0; j < worldHeight; j++) {
+            patches[i][j] = new Patch(this, i + minPatchX, j + minPatchY);
+            TouchManager.addTouchable(patches[i][j]);
+         }
+      }
+      
       var colors = [
                    new Color(255, 0, 0, 255),
                    new Color(0, 255, 0, 255),
@@ -64,6 +76,25 @@ class Model {
    }
    
    
+   void clearTurtles() {
+      for (var t in turtles) {
+         TouchManager.removeTouchable(t);
+      }
+      turtles = new List<Turtle>();
+   }
+   
+   
+   void clearPatches() {
+      if (patches == null) return;
+      for (var col in patches) {
+         for (var patch in col) {
+            TouchManager.removeTouchable(patch);
+         }
+      }
+      patches = null;
+   }
+   
+   
    void resizeToFitScreen(int screenW, int screenH) {
       int hpatches = screenW ~/ patchSize;
       int vpatches = screenH ~/ patchSize;
@@ -71,15 +102,6 @@ class Model {
       maxPatchY = vpatches ~/ 2;
       minPatchX = maxPatchX - hpatches + 1;
       minPatchY = maxPatchY - vpatches + 1;
-      
-      patches = new List(hpatches);
-      for (int i=0; i < hpatches; i++) {
-         patches[i] = new List<Patch>(vpatches);
-         for (int j=0; j < vpatches; j++) {
-            patches[i][j] = new Patch(this, i + minPatchX, j + minPatchY);
-            TouchManager.addTouchable(patches[i][j]);
-         }
-      }
    }
    
       
