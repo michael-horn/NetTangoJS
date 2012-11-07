@@ -23,11 +23,13 @@ class Turtle implements Touchable {
    Model model;       // reference back to the containing model
    bool dead = false; // flag used to remove turtle from the model
 
+   num energy = 1;
    
    Turtle(this.model) {
       id = model.nextTurtleId;
       heading = rnd.nextInt(360);
       color = new Color(255, 255, 0, 50);
+      energy = 0.5 + rnd.nextDouble() * 0.5;
    }
    
    
@@ -39,7 +41,6 @@ class Turtle implements Touchable {
       t.heading = heading;
       t.color = color.clone();
       t.dead = false;
-      model.addTurtle(t);
       return t;
    }
    
@@ -73,6 +74,7 @@ class Turtle implements Touchable {
    
    void hatch() {
       Turtle copy = clone(this);
+      model.addTurtle(copy);
    }
    
    
@@ -130,6 +132,17 @@ class Turtle implements Touchable {
       right(rnd.nextInt(20));
       left(rnd.nextInt(20));
       Patch p = patchHere();
+      if (energy < 1 && p.energy > 0.2) {
+         energy += 0.03;
+         p.energy -= 0.2;
+      }
+      color.alpha = (255 * energy).toInt();
+      energy -= 0.01;
+      if (energy < 0) {
+         die();
+      } else if (energy > 0.9 && rnd.nextInt(100) > 95) {
+         hatch();
+      }
    }
    
    
