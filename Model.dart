@@ -38,22 +38,24 @@ class Model {
    Model(this.ntango) {
       turtles = new List<Turtle>();
       patches = null; // don't create patches until resize is called
-
-      
+   }
+   
+   
+   void setup() {
+      turtles = new List<Turtle>();
       var colors = [
-          new Color(255, 0, 0, 255),
-          new Color(0, 255, 0, 255),
-          new Color(0, 0, 255, 255),
-          new Color(255, 255, 0, 255),
-          new Color(0, 255, 255, 255)];
-      
+                   new Color(255, 0, 0, 255),
+                   new Color(0, 255, 0, 255),
+                   new Color(0, 0, 255, 255),
+                   new Color(255, 255, 0, 255),
+                   new Color(0, 255, 255, 255)];
+     
       for (int i=0; i<60; i++) {
          Turtle t = new Turtle(this);
          t.color = colors[i % 5].clone();
          addTurtle(t);
       }
-      
-   }
+   }     
    
    
    void addTurtle(Turtle t) {
@@ -80,10 +82,7 @@ class Model {
       }
    }
    
-   
-   void restart() { }
-   
-   
+      
    void tick(int count) {
      
       // remove dead turtles
