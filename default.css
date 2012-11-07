@@ -16,16 +16,16 @@ body {
 
 #patches {
    position: absolute;
-   z-index: 0;
    left: 0px;
    top: 0px;
+   z-index: -1;
 }
 
 #turtles {
    position; absolute;
-   z-index: 1;
    left: 0px;
    top: 0px;
+   z-index: 1;
 }
 
 #events {
