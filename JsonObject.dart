@@ -157,10 +157,10 @@ class JsonObject extends Object implements Map {
   bool containsKey(value) => _objectData.containsKey(value);
   operator [](key) => _objectData[key];
   forEach(func(key,value)) => _objectData.forEach(func);
-  Collection getKeys() => _objectData.getKeys();
-  Collection getValues() => _objectData.getValues();
   int get length => _objectData.length;
-  bool isEmpty() => _objectData.isEmpty();
+  bool get isEmpty() => _objectData.isEmpty;
+  Collection get keys() => _objectData.keys;
+  Collection get values() => _objectData.values;
 
   //Specific implementations which check isExtendable to determine if an
   //unknown key should be allowed
@@ -176,7 +176,7 @@ class JsonObject extends Object implements Map {
       return _objectData[key] = value;
     }
     else {
-      throw new UnsupportedOperationException("JsonObject is not extendable");
+      throw new Exception("JsonObject is not extendable");
     }
   }
 
@@ -189,7 +189,7 @@ class JsonObject extends Object implements Map {
       return _objectData.putIfAbsent(key, ifAbsent);
     }
     else {
-      throw new UnsupportedOperationException("JsonObject is not extendable");
+      throw new Exception("JsonObject is not extendable");
     }
   }
 
@@ -202,7 +202,7 @@ class JsonObject extends Object implements Map {
       return _objectData.remove(key);
     }
     else {
-      throw new UnsupportedOperationException("JsonObject is not extendable");
+      throw new Exception("JsonObject is not extendable");
     }
   }
 
@@ -213,7 +213,7 @@ class JsonObject extends Object implements Map {
       _objectData.clear();
     }
     else {
-      throw new UnsupportedOperationException("JsonObject is not extendable");
+      throw new Exception("JsonObject is not extendable");
     }
 
   }
