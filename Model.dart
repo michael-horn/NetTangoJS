@@ -11,7 +11,7 @@
  * material are those of the author(s) and do not necessarily reflect the views
  * of the National Science Foundation (NSF).
  */
-class Model {
+abstract class Model {
    
    // Drawing context for turtles (TODO: use proper type)
   CanvasRenderingContext2D tctx;
@@ -63,11 +63,10 @@ class Model {
    }
    
    
-   void setup() {
-      
-      clearTurtles();
-      clearPatches();
-      
+   abstract void setup();
+   
+   
+   void initPatches() { 
       patches = new List(worldWidth);
       for (int i=0; i < patches.length; i++) {
          patches[i] = new List<Patch>(worldHeight);
@@ -76,20 +75,7 @@ class Model {
             TouchManager.addTouchable(patches[i][j]);
          }
       }
-      
-      var colors = [
-                   new Color(255, 0, 0, 255),
-                   new Color(0, 255, 0, 255),
-                   new Color(0, 0, 255, 255),
-                   new Color(255, 255, 0, 255),
-                   new Color(0, 255, 255, 255)];
-     
-      for (int i=0; i<60; i++) {
-         Turtle t = new Turtle(this);
-         t.color = colors[i % 5].clone();
-         addTurtle(t);
-      }
-   }     
+   }
    
    
    void addTurtle(Turtle t) {
