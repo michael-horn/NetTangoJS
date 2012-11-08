@@ -23,8 +23,6 @@ class Turtle implements Touchable {
    Model model;       // reference back to the containing model
    bool dead = false; // flag used to remove turtle from the model
 
-   num energy = 1;
-   
    var drawShape = null;   // function to draw specific turtle shapes
    
    
@@ -32,7 +30,6 @@ class Turtle implements Touchable {
       id = model.nextTurtleId();
       heading = rnd.nextInt(360);
       color = new Color(255, 255, 0, 50);
-      energy = 0.5 + rnd.nextDouble() * 0.5;
    }
    
    
@@ -137,21 +134,6 @@ class Turtle implements Touchable {
    
    void tick() {
       if (dead) return;
-      forward(0.1);
-      right(rnd.nextInt(20));
-      left(rnd.nextInt(20));
-      Patch p = patchHere();
-      if (energy < 1 && p.energy > 0.2) {
-         energy += 0.03;
-         p.energy -= 0.2;
-      }
-      color.alpha = (255 * energy).toInt();
-      energy -= 0.01;
-      if (energy <= 0) {
-         die();
-      } else if (energy > 0.9 && rnd.nextInt(100) > 95) {
-         hatch();
-      }
    }
    
    
