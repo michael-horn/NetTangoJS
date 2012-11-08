@@ -25,8 +25,11 @@ class Turtle implements Touchable {
 
    num energy = 1;
    
+   var drawShape = null;   // function to draw specific turtle shapes
+   
+   
    Turtle(this.model) {
-      id = model.nextTurtleId;
+      id = model.nextTurtleId();
       heading = rnd.nextInt(360);
       color = new Color(255, 255, 0, 50);
       energy = 0.5 + rnd.nextDouble() * 0.5;
@@ -42,6 +45,12 @@ class Turtle implements Touchable {
       t.color = color.clone();
       t.dead = false;
       return t;
+   }
+   
+   
+   void setXY(num x, num y) {
+      this.x = wrapX(x);
+      this.y = wrapY(y);
    }
    
    
@@ -68,49 +77,49 @@ class Turtle implements Touchable {
    
    void die() {
       dead = true;
-      color.setColor(0, 0, 0, 255);
    }
    
    
-   void hatch() {
+   Turtle hatch() {
       Turtle copy = clone(this);
       model.addTurtle(copy);
+      return copy;
    }
    
    
    num wrapX(num tx) {
-      if (tx < model.minWorldX) {
-         return tx + model.worldWidth;
-      } else if (tx > model.maxWorldX) {
-         return tx - model.worldWidth;
-      } else {
-         return tx;
+      while (tx < model.minWorldX) {
+         tx += model.worldWidth;
       }
+      while (tx > model.maxWorldX) {
+         tx -= model.worldWidth;
+      }
+      return tx;
    }
    
    
    num wrapY(num ty) {
-      if (ty < model.minWorldY) {
-         return ty + model.worldHeight;
-      } else if (ty > model.maxWorldY) {
-         return ty - model.worldHeight;
-      } else {
-         return ty;
-      }
+      while (ty < model.minWorldY) {
+         ty += model.worldHeight;
+      } 
+      while (ty > model.maxWorldY) {
+         ty -= model.worldHeight;
+      } 
+      return ty;
    }
    
    
    void draw(var ctx) {
-      ctx.save();
-      ctx.translate(x, y); // translate to the origin
-      ctx.rotate(heading); // rotate north
-      roundRect(ctx, -0.2, -0.5, 0.4, 1, 0.2);
-      ctx.fillStyle = color.toString();
-      ctx.fill();
-      ctx.strokeStyle = "rgba(255, 255, 255, 0.5)";
-      ctx.lineWidth = 0.05;
-      ctx.stroke();
-      ctx.restore();
+      if (drawShape != null) {
+         drawShape(ctx);
+      } else {
+         roundRect(ctx, -0.2, -0.5, 0.4, 1, 0.2);
+         ctx.fillStyle = color.toString();
+         ctx.fill();
+         ctx.strokeStyle = "rgba(255, 255, 255, 0.5)";
+         ctx.lineWidth = 0.05;
+         ctx.stroke();
+      }
    }
    
    
@@ -126,7 +135,7 @@ class Turtle implements Touchable {
    }
    
    
-   void animate() {
+   void tick() {
       if (dead) return;
       forward(0.1);
       right(rnd.nextInt(20));
@@ -138,7 +147,7 @@ class Turtle implements Touchable {
       }
       color.alpha = (255 * energy).toInt();
       energy -= 0.01;
-      if (energy < 0) {
+      if (energy <= 0) {
          die();
       } else if (energy > 0.9 && rnd.nextInt(100) > 95) {
          hatch();
