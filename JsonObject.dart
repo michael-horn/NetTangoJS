@@ -158,9 +158,9 @@ class JsonObject extends Object implements Map {
   operator [](key) => _objectData[key];
   forEach(func(key,value)) => _objectData.forEach(func);
   int get length => _objectData.length;
-  bool get isEmpty() => _objectData.isEmpty;
-  Collection get keys() => _objectData.keys;
-  Collection get values() => _objectData.values;
+  bool isEmpty() => _objectData.isEmpty();
+  Collection getKeys() => _objectData.getKeys();
+  Collection getValues() => _objectData.getValues();
 
   //Specific implementations which check isExtendable to determine if an
   //unknown key should be allowed
