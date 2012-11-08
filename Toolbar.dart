@@ -354,7 +354,6 @@ class Toolbar implements Touchable {
    bool containsTouch(TouchEvent event) {
       num tx = event.touchX;
       num ty = event.touchY;
-      print("testing");
       return (tx >= x && ty >= y && tx <= x + width && ty <= y + height);
    }
    
