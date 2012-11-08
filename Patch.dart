@@ -33,7 +33,7 @@
    }
    
    
-   void animate() {
+   void tick() {
       if (energy < 1) {
          energy += 0.01;
          dirty = true;
