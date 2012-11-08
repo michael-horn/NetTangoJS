@@ -39,7 +39,7 @@ class NetTango extends TouchManager {
       //canvas.height = height;
       
       // Resize the model
-      model.resizeToFitScreen(width, height);
+      model.resize(50, 50, width, height);
       
       // Event capture layer
       canvas = document.query("#events");
@@ -121,6 +121,23 @@ class NetTango extends TouchManager {
       pause();
       ticks++;
       animate();
+      draw();
+   }
+   
+   
+/*
+ * Toggle fullscreen mode
+ */
+   void fullscreen() {
+      restart();
+      model.resize(0, 0, window.innerWidth, window.innerHeight);
+      draw();
+   }
+   
+   
+   void partscreen() {
+      restart();
+      model.resize(50, 50, width, height);
       draw();
    }
    

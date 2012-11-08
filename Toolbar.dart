@@ -110,15 +110,20 @@ class Toolbar implements Touchable {
       bx = w - 8 - bw;
       button = new Button(bx, by, bw, bh, "fullscreen");
       button.setImage("images/fullscreen.png");
-      button.visible = false;
-      button.enabled = false;
+      button.visible = true;
+      button.enabled = true;
       buttons.add(button);
       button.onDown = repaint;
+      button.onClick = doFullscreen;
       fullButton = button;
       
       button = new Button(bx, by, bw, bh, "partscreen");
       button.setImage("images/partscreen.png");
+      button.visible = false;
+      button.enabled = false;
       buttons.add(button);
+      button.onDown = repaint;
+      button.onClick = doPartscreen;
       partButton = button;
 
       bw = 250;
@@ -191,6 +196,25 @@ class Toolbar implements Touchable {
       draw();      
    }
    
+   
+   void doFullscreen(var a) {
+      partButton.enabled = true;
+      partButton.visible = true;
+      fullButton.enabled = false;
+      fullButton.visible = false;
+      app.fullscreen();
+      draw();
+   }
+   
+   
+   void doPartscreen(var a) {
+     partButton.enabled = false;
+     partButton.visible = false;
+     fullButton.enabled = true;
+     fullButton.visible = true;
+     app.partscreen();
+     draw();     
+   }
 
    void draw() {
       
