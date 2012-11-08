@@ -205,13 +205,13 @@ class Toolbar implements Touchable {
       //---------------------------------------------
       // Draw speedup
       //---------------------------------------------
-      ctx.font = "24px sans-serif";
+      ctx.font = "18px sans-serif";
       ctx.fillStyle = "white";
       ctx.textBaseline = "bottom";
       ctx.textAlign = "left";
       int pstate = app.play_state.abs();
       if (pstate > 1) {
-         ctx.fillText("x$pstate", w~/2 - 160, h - 10);
+         ctx.fillText("x$pstate", w~/2 - 167, h - 10);
       } 
       
       //---------------------------------------------
