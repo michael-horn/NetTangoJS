@@ -120,7 +120,10 @@ abstract class Model {
       canvas.width = w;
       canvas.height = h;
       canvas.style.left = "${x}px";
-      canvas.style.top = "${y}px";     
+      canvas.style.top = "${y}px";
+      
+      offsetX = x;
+      offsetY = y;
 
       int hpatches = w ~/ patchSize;
       int vpatches = h ~/ patchSize;
