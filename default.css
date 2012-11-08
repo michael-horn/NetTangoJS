@@ -3,7 +3,6 @@
 * { -webkit-user-select: none; }
 
 body {
-   background-image: url('images/texture2.png');
    margin: 0;
    padding: 0;
    color: #ccc;
@@ -11,21 +10,23 @@ body {
    font-weight: 300;
    line-height: 1.625;
    overflow: hidden;
-   background-color: #005368;
+   background-color: #445368;
 }
 
 #patches {
+   background-image: url('images/img3.jpg');
    position: absolute;
-   left: 0px;
-   top: 0px;
-   z-index: -1;
+   left: 50px;
+   top: 50px;
+   z-index: 0;
 }
 
 #turtles {
-   position; absolute;
-   left: 0px;
-   top: 0px;
+   position: absolute;
+   left: 50px;
+   top: 50px;
    z-index: 1;
+   border: 1px solid black;
 }
 
 #events {
