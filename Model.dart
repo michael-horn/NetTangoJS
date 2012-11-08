@@ -13,16 +13,23 @@
  */
 class Model {
    
+   // Drawing context for turtles (TODO: use proper type)
+  CanvasRenderingContext2D tctx;
+   
+   // Drawing context for patches
+  CanvasRenderingContext2D pctx;
+  
    // A collection of turtles in the model
    List turtles;
+   
+   // List of dead turtles
+   List deadTurtles;
    
    // A list of patches
    List patches;
    
-   // Reference to the main application
-   NetTango ntango;
-   
    // Size of a patch in pixels
+   // TODO: Maybe patch size should vary according to world size rather than vice versa
    int patchSize = 40;
    
    // Dimensions of the world in patch coordinates
@@ -31,13 +38,28 @@ class Model {
    int maxPatchY = 12;
    int minPatchY = -12;
    
+   // position of the canvas on the screen
+   int offsetX = 0, offsetY = 0;
+   
    // Used to generate unique turtle id numbers
    int TURTLE_ID = 0;
    
+   static Random rnd = new Random();
    
-   Model(this.ntango) {
+   
+   Model() {
       turtles = new List<Turtle>();
+      deadTurtles = new List<Turtle>();
       patches = null; // don't create patches until resize is called
+      
+      CanvasElement canvas = document.query("#patches");
+      pctx = canvas.getContext("2d");
+      
+      canvas = document.query("#turtles");
+      tctx = canvas.getContext("2d");
+      
+      offsetX = canvas.offsetLeft;
+      offsetY = canvas.offsetTop;
    }
    
    
@@ -81,6 +103,7 @@ class Model {
          TouchManager.removeTouchable(t);
       }
       turtles = new List<Turtle>();
+      deadTurtles = new List<Turtle>();
    }
    
    
@@ -92,6 +115,11 @@ class Model {
          }
       }
       patches = null;
+   }
+   
+   
+   Turtle oneOfTurtles() {
+      return turtles[rnd.nextInt(turtles.length)];
    }
    
    
@@ -113,22 +141,29 @@ class Model {
          if (t.dead) {
             turtles.removeAt(i);
             TouchManager.removeTouchable(t);
+            deadTurtles.add(t);
          }
       }
       
       // animate turtles
       for (var turtle in turtles) {
-         turtle.animate();
+         turtle.tick();
       }
       
       // animate patches
       if (patches != null) {
          for (var col in patches) {
             for (var patch in col) {
-               patch.animate();
+               patch.tick();
             }
          }
       }
+   }
+   
+   
+   void draw() {
+      drawPatches(pctx);
+      drawTurtles(tctx);
    }
  
    
@@ -139,8 +174,13 @@ class Model {
       ctx.translate(cx, cy);
       ctx.scale(patchSize, -patchSize);
       
+      ctx.clearRect(minWorldX, minWorldY, worldWidth, worldHeight);
       for (var turtle in turtles) {
+         ctx.save();
+         ctx.translate(turtle.x, turtle.y);
+         ctx.rotate(turtle.heading);
          turtle.draw(ctx);
+         ctx.restore();
       }
       ctx.restore();
    }
@@ -174,18 +214,21 @@ class Model {
    
    
    num screenToWorldX(num sx, num sy) {
+      sx -= offsetX;
       num cx = (0.5 - minPatchX) * patchSize;
       return (sx - cx) / patchSize;
    }
    
    
    num screenToWorldY(num sx, num sy) {
+      sy -= offsetY;
       num cy = (0.5 - minPatchY) * patchSize;
       return (cy - sy) / patchSize;      
    }
    
    
-   int get nextTurtleId => TURTLE_ID++;
+   int nextTurtleId() => TURTLE_ID++;
+   
    num get minWorldY => minPatchY - 0.5;
    num get minWorldX => minPatchX - 0.5;
    num get maxWorldY => maxPatchY + 0.5;
