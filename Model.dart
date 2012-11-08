@@ -109,16 +109,33 @@ abstract class Model {
    }
    
    
-   void resizeToFitScreen(int screenW, int screenH) {
-      int hpatches = screenW ~/ patchSize;
-      int vpatches = screenH ~/ patchSize;
+   void resize(int x, int y, int w, int h) {
+      CanvasElement canvas = document.query("#patches");
+      canvas.width = w;
+      canvas.height = h;
+      canvas.style.left = "${x}px";
+      canvas.style.top = "${y}px";
+
+      canvas = document.query("#turtles");
+      canvas.width = w;
+      canvas.height = h;
+      canvas.style.left = "${x}px";
+      canvas.style.top = "${y}px";     
+
+      int hpatches = w ~/ patchSize;
+      int vpatches = h ~/ patchSize;
       maxPatchX = hpatches ~/ 2;
       maxPatchY = vpatches ~/ 2;
       minPatchX = maxPatchX - hpatches + 1;
       minPatchY = maxPatchY - vpatches + 1;
+      
+      if (patches != null) {
+         clearPatches();
+         initPatches();
+      }
    }
    
-      
+   
    void tick(int count) {
      
       // remove dead turtles
